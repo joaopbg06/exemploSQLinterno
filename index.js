@@ -1,6 +1,6 @@
 import { View, TextInput, Button, StyleSheet,} from 'react-native';
 import { useState } from 'react';
-// Função para inicializar o aplicativo de catálogo de filmes
+
 export default function Index() {
     
     const [titulo, setTitulo] = useState('');
@@ -10,7 +10,7 @@ export default function Index() {
     const [pesquisa, setPesquisa] = useState('');
 
     return (
-        <View>
+        <View >
             <TextInput
                 style={styles.texto}
                 placeholder="Insira o titulo do filme"
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     botao:{
-        back
+        
     },
     texto: {
         height: 20,
