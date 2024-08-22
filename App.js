@@ -4,7 +4,7 @@ import  Index  from './index';
 
 export default function App() {
   return (
-    <SQLiteProvider databaseName="meusFilmes.db" onInit={IniciarBD}>
+    <SQLiteProvider databaseName="meusFilmes3.db" onInit={IniciarBD}>
       <Index />
     </SQLiteProvider>
   );

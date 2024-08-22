@@ -1,56 +1,57 @@
-
-const itemInput = document.getElementById('item-input');
-const addButton = document.getElementById('add-button');
-const itemList = document.getElementById('item-list');
-const removeSelect = document.getElementById('remove-select');
-const removeButton = document.getElementById('remove-button');
-
-function addItem() {
-    const itemText = itemInput.value.trim();
-
-    if (itemText !== '') {
-
-        const items = itemText.split('\n').map(item => item.trim()).filter(item => item !== '');
-
-        items.forEach(item => {
-
-            const li = document.createElement('li');
-            li.textContent = item;
+import { Pressable, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
+import { useState } from 'react';
 
 
-            itemList.appendChild(li);
+export default function Filme({ dataFilme, onDelete, onSelectChange, isSelected }) {
+    const [onSelect, setOnSelect] = useState(false)
 
+    const handlePress = () => {
+        const novoEstado = !onSelect;
+        setOnSelect(novoEstado);
+        onSelectChange(novoEstado ? dataFilme : null); // Passa o produto ou null para o pai
+    };
 
-            const option = document.createElement('option');
-            option.value = item;
-            option.textContent = item;
-            removeSelect.appendChild(option);
-        });
+    return (
+        <Pressable style={isSelected ? styles.selectedContainer : styles.container}
+            onPress={handlePress}
+        >
 
+            <Text style={styles.text}>
+                {dataFilme.titulo} - {dataFilme.genero} - {dataFilme.data} - {dataFilme.nota}
+            </Text>
 
-        itemInput.value = '';
-    }
-}
+            <TouchableOpacity
+                onPress={onDelete}
+            >
+                <MaterialIcons name="delete" size={24} color="red" />
+            </TouchableOpacity>
 
+        </Pressable>
+    );
+};
 
-function removeItem() {
-    const selectedOption = removeSelect.options[removeSelect.selectedIndex];
+const styles = StyleSheet.create({
+    container: {
+        backgroundColor: "#CECECE",
+        padding: 24,
+        marginVertical: 5,
+        borderRadius: 5,
+        gap: 12,
+        flexDirection: "row",
+    },
+    selectedContainer: {
+        backgroundColor: "#CECECE",
+        padding: 24,
+        borderRadius: 5,
+        gap: 12,
+        flexDirection: "row",
 
-    if (selectedOption) {
-        const itemText = selectedOption.value;
+        borderColor: "#000",
+        borderWidth: 1,
+    },
+    text: {
+        flex: 1,
+    },
 
-        const items = Array.from(itemList.children);
-        const itemToRemove = items.find(item => item.textContent === itemText);
-
-        if (itemToRemove) {
-            itemList.removeChild(itemToRemove);
-        }
-
-
-        removeSelect.removeChild(selectedOption);
-    }
-}
-
-
-addButton.addEventListener('click', addItem);
-removeButton.addEventListener('click', removeItem);
+});

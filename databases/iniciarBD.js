@@ -4,12 +4,9 @@ export async function IniciarBD(bd) {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         titulo TEXT NOT NULL,
         genero TEXT NOT NULL,
-        data DATE,    
-        nota FLOAT          
+        data INTERGER NOT NULL,    
+        nota FLOAT NOT NULL          
 );
 
     `);
 }
-// façam a tabela ai 
-
-//ta feita já KKK
