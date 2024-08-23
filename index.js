@@ -1,9 +1,15 @@
-import { View, TextInput, Button, StyleSheet, FlatList, Alert, ScrollView } from 'react-native';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { View, TextInput, Button, StyleSheet, FlatList, Alert, ScrollView, Text, Pressable, Modal } from 'react-native'; 
+import { Ionicons } from '@expo/vector-icons';
+import { useFonts } from 'expo-font';
+import Modal1 from './components/modal1';
+import Modal2 from './components/modal2';
 import Filme from './components/filme';
 import usarBD from './hooks/usarBD';
 
 export default function Index() {
+    useFonts({ 'fonte': require('./assets/fonts/Inknut_Antiqua/InknutAntiqua-Regular.ttf') });
+
     const [id, setId] = useState('');
 
     const [titulo, setTitulo] = useState('');
@@ -20,12 +26,10 @@ export default function Index() {
     const [itemSelecionado, setItemSelecionado] = useState(null);
 
 
-
-    const produtosBD = usarBD(); // Agora `produtosBD` é um objeto com os métodos de CRUD
-
-    // Função para limpar todos os dados da tabela
+    const [modalVisible, setModalVisible] = useState(false);
 
 
+    const produtosBD = usarBD();
 
     const remove = async (id) => {
 
@@ -42,8 +46,6 @@ export default function Index() {
         if (!titulo.trim() || !genero.trim() || !nota.trim() || !data.trim()) {
             return Alert.alert('Erro', 'Todos os campos devem ser preenchidos');
         }
-
-
         try {
             const item = await produtosBD.create({
                 titulo,
@@ -51,10 +53,6 @@ export default function Index() {
                 data,
                 nota
             });
-
-
-
-
 
             Alert.alert('Produto cadastrado com o ID: ' + item.idProduto);
             setId(item.idProduto);
@@ -103,12 +101,17 @@ export default function Index() {
             console.error('Erro ao filtrar filmes:', error);
         }
     }
-    
 
+    const handleDataFromChild = (data) => {
+        setFilmes(data); // Armazena o array vindo do filho no estado do pai
+    };
+    const handleDataFromChild2 = (data) => {
+        setFilmes(data); // Armazena o array vindo do filho no estado do pai
+    };
 
     useEffect(() => {
         listar();
-    }, [pesquisa]);
+    }, []);
 
 
     const handleProdutoSelect = (produto) => {
@@ -125,113 +128,121 @@ export default function Index() {
     }, [produtoSelecionado]);
 
     return (
-        <ScrollView>
-            <View style={styles.container}>
-            <TextInput
-                style={styles.texto}
-                placeholder="Insira o titulo do filme"
-                onChangeText={setTitulo}
-                value={titulo}
-            />
-            <TextInput
-                style={styles.texto}
-                placeholder="Genero"
-                onChangeText={setGenero}
-                value={genero}
-            />
-            <TextInput
-                style={styles.texto}
-                placeholder="Nota (0-10)"
-                onChangeText={setNota}
-                value={nota}
-                maxLength={4} // Limita a entrada para 10.00
-            />
-            <TextInput
-                style={styles.texto}
-                placeholder="Ano de Lançamento"
-                onChangeText={setData}
-                value={data}
-                maxLength={4}
-            />
+        <View style={styles.container}>
+            <View style={styles.header}>
+                <View>
+                    <Text style={styles.titulo}>Zé Filmess</Text>
+                </View>
 
-            <Button
-                style={styles.botao}
-                title="Adicionar Filme"
-                onPress={() => create()}
-            />
+                <Pressable onPress={() => setModalVisible(true)} style={styles.adicionar}>
+                    <Ionicons name="add-outline" size={35} color="#000" style={{ padding: 5 }} />
+                </Pressable>
+            </View>
 
-            <Button
-                style={styles.botao}
-                title="Editar"
-                onPress={() => editar(titulo, genero, data, nota)}
-            />
-
-            <Button
-                style={styles.botao}
-                title="filmes log"
-                onPress={() => console.log(filmes)}
-            />
-
-            <Button
-                style={styles.botao}
-                title="filtro"
-                onPress={() => filtrar(filtro)}
-            />
-
-            <TextInput
-                style={styles.texto}
-                placeholder="filtro"
-                onChangeText={setFiltro}
-            />
-
-
-            <TextInput
-                style={styles.texto}
-                placeholder="Pesquisar"
-                onChangeText={setPesquisa}
-            />
-
-            <ScrollView >
+            <ScrollView>
                 {filmes.map((filme) => (
                     <Filme
-                        key={filme.id}  // Utilizando o id como chave
+                        key={filme.id}
                         dataFilme={filme}
                         onDelete={() => remove(filme.id)}
                         onSelectChange={handleProdutoSelect}
                         isSelected={produtoSelecionado?.id === filme.id}
+                        send={handleDataFromChild2}
                     />
                 ))}
             </ScrollView>
 
+            <Modal1 isVisible={modalVisible} onClose={() => setModalVisible(false)}  sendDataToParent={handleDataFromChild}/>
         </View>
-        </ScrollView>
-    )
-
+    );
 }
 
-
 const styles = StyleSheet.create({
-
     container: {
         flex: 1,
-        justifyContent: 'flex-start',
-        marginTop: 20,
-        padding: 32,
-        gap: 16,
     },
-    texto: {
-        height: 50,
-        borderWidth: 1,
+    titulo: {
+        fontFamily: 'fonte',
+        fontSize: 14,
+    },
+    header: {
+        backgroundColor: '#D9D9D9',
+        paddingTop: 35,
+        paddingBottom: 20,
+        paddingHorizontal: 15,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 25,
+    },
+    adicionar: {
+        backgroundColor: '#B9B9B9',
         borderRadius: 5,
-        borderColor: "#999",
-        paddingHorizontal: 16,
-
+        alignItems: 'center',
+        justifyContent: 'center',
     },
-    listContent: {
-        gap: 16,
-    }
-
 });
 
 
 
+
+// <TextInput
+//                     style={styles.texto}
+//                     placeholder="Insira o titulo do filme"
+//                     onChangeText={setTitulo}
+//                     value={titulo}
+//                 />
+//                 <TextInput
+//                     style={styles.texto}
+//                     placeholder="Genero"
+//                     onChangeText={setGenero}
+//                     value={genero}
+//                 />
+//                 <TextInput
+//                     style={styles.texto}
+//                     placeholder="Nota (0-10)"
+//                     onChangeText={setNota}
+//                     value={nota}
+//                     maxLength={4} // Limita a entrada para 10.00
+//                 />
+//                 <TextInput
+//                     style={styles.texto}
+//                     placeholder="Ano de Lançamento"
+//                     onChangeText={setData}
+//                     value={data}
+//                     maxLength={4}
+//                 />
+
+//                 <Button
+//                     style={styles.botao}
+//                     title="Adicionar Filme"
+//                     onPress={() => create()}
+//                 />
+
+//                 <Button
+//                     style={styles.botao}
+//                     title="Editar"
+//                     onPress={() => editar(titulo, genero, data, nota)}
+//                 />
+
+//                 <Button
+//                     style={styles.botao}
+//                     title="filmes log"
+//                     onPress={() => console.log(filmes)}
+//                 />
+
+//                 <Button
+//                     style={styles.botao}
+//                     title="filtro"
+//                     onPress={() => filtrar(filtro)}
+//                 />
+
+//                 <TextInput
+//                 />
+
+
+//                 <TextInput
+//                     style={styles.texto}
+//                     placeholder="Pesquisar"
+//                     onChangeText={setPesquisa}
+//                 />
